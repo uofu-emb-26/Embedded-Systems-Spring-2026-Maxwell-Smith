@@ -29,8 +29,6 @@ int main(void)
 
   // Set up a configuration struct to pass to the initialization function
   GPIO_InitTypeDef initStr = {GPIO_PIN_8 | GPIO_PIN_9, GPIO_MODE_OUTPUT_PP, GPIO_SPEED_FREQ_LOW, GPIO_NOPULL};
-
-
   HAL_GPIO_Init(GPIOC, &initStr);
 
   moder_mask = (3u << 16u | 3u << 18u);
@@ -48,6 +46,10 @@ int main(void)
   
 
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
+
+  assert((GPIOC->ODR & GPIO_PIN_8) != 0u); // Should have been set
+  assert((GPIOC->ODR & GPIO_PIN_9) == 0u); // should not have been set
+
   while (1)
   {
     HAL_Delay(200); // Delay 200ms
