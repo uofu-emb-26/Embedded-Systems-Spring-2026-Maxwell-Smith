@@ -15,6 +15,7 @@ int main(void)
   uint32_t moder_mask;
   uint32_t moder_expect;
   uint32_t otyper_mask;
+  uint32_t ospeedr_mask;
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
   /* Configure the system clock */
@@ -34,7 +35,11 @@ int main(void)
   assert((GPIOC->MODER & moder_mask) == moder_expect);
 
   otyper_mask = ((1u << 8u) | (1u << 9u));
-  assert((GPIOC->OTYPER & otyper_mask) == 0u);
+  assert((GPIOC->OTYPER & otyper_mask) == 0u); // 0 for push pull (OUPUT_PP)
+
+  ospeedr_mask = moder_mask; // Same offset from pointer as MODER
+  assert((GPIOC->OSPEEDR & ospeedr_mask) == 0u); // 0 for low frequency (SPEED_FREQ_LOW)
+  
 
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
   while (1)
