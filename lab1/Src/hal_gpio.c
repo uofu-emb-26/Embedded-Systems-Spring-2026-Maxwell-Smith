@@ -18,7 +18,7 @@ void My_HAL_GPIO_Init(GPIO_TypeDef  *GPIOx, GPIO_InitTypeDef *GPIO_Init)
             continue;
         }
 
-        GPIOx->MODER &= ~(3u << shift_amt);
+        GPIOx->MODER &= ~(3u << shift_amt); // clear
 
         if (GPIO_Init->Mode == GPIO_MODE_OUTPUT_PP || GPIO_Init->Mode == GPIO_MODE_OUTPUT_OD){
             GPIOx->MODER |= (1u << shift_amt);
@@ -28,11 +28,14 @@ void My_HAL_GPIO_Init(GPIO_TypeDef  *GPIOx, GPIO_InitTypeDef *GPIO_Init)
             GPIOx->OTYPER |= mask;
         }
         else {
-            GPIOx->OTYPER &= mask;
+            GPIOx->OTYPER &= ~mask;
         }
 
-        GPIOx->OSPEEDR &= ~(3u << shift_amt);
+        GPIOx->OSPEEDR &= ~(3u << shift_amt); // clear
         GPIOx->OSPEEDR |= ((GPIO_Init->Speed & 3u) << shift_amt);
+
+        GPIOx->PUPDR &= ~(3u << shift_amt); // clear
+        GPIOx->PUPDR |= ((GPIO_Init->Pull & 3u) << shift_amt);
     }
 
     // uint32_t pin_mask;
@@ -67,12 +70,17 @@ void My_HAL_GPIO_DeInit(GPIO_TypeDef  *GPIOx, uint32_t GPIO_Pin)
 }
 */
 
-/*
+
 GPIO_PinState My_HAL_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
-    return -1;
+    if (((GPIOx->IDR & GPIO_Pin) != 0u))
+    {
+        return GPIO_PIN_SET;
+    }
+
+    return GPIO_PIN_RESET;
 }
-*/
+
 
 
 void My_HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState)

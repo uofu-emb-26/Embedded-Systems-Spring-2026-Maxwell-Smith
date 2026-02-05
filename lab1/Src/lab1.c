@@ -22,6 +22,8 @@ int main(void)
 
   // uint32_t old_odr;
 
+  uint32_t debouncer = 0;
+
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
@@ -29,14 +31,20 @@ int main(void)
   SystemClock_Config();
 
   //__HAL_RCC_GPIOC_CLK_ENABLE(); // Enable the GPIOC clock in the RCC
-  HAL_RCC_GPIOC_CLK_Enable(); // new clk enable written in rcc.c
+  HAL_RCC_GPIOC_CLK_Enable(); // Enable clk for GPIOC
+  HAL_RCC_GPPIOA_CLK_Enable(); // Enable clk for GPIOA
+
   //assert((RCC->AHBENR & (1u << 19)) != 0u); // IOPCEN bit-19 in AHBERN (14 offset to AHBERN)
 
   // Set up a configuration struct to pass to the initialization function
   //GPIO_InitTypeDef initStr = {GPIO_PIN_8 | GPIO_PIN_9, GPIO_MODE_OUTPUT_PP, GPIO_SPEED_FREQ_LOW, GPIO_NOPULL};
   //HAL_GPIO_Init(GPIOC, &initStr);
-  GPIO_InitTypeDef initStr = {GPIO_PIN_6 | GPIO_PIN_7, GPIO_MODE_OUTPUT_PP, GPIO_SPEED_FREQ_LOW, GPIO_NOPULL};
-  My_HAL_GPIO_Init(GPIOC, &initStr);
+
+  GPIO_InitTypeDef C = {GPIO_PIN_6 | GPIO_PIN_7, GPIO_MODE_OUTPUT_PP, GPIO_SPEED_FREQ_LOW, GPIO_NOPULL};
+  My_HAL_GPIO_Init(GPIOC, &C);
+
+  GPIO_InitTypeDef A = {GPIO_PIN_0, GPIO_MODE_INPUT, GPIO_SPEED_FREQ_LOW, GPIO_PULLDOWN};
+  My_HAL_GPIO_Init(GPIOA, &A);
 
   //moder_mask = (3u << 16u | 3u << 18u);
   //moder_expect = (1u << 16u | 1u << 18u);
@@ -61,14 +69,25 @@ int main(void)
 
   while (1)
   {
-    HAL_Delay(200); // Delay 200ms
+    HAL_Delay(1); // Delay 1ms
+
+    debouncer = debouncer << 1u;
+    if (My_HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) == GPIO_PIN_SET)
+    {
+      debouncer |= 1u;
+    }
+
+    if (debouncer == 0x7FFFFFFFu){
+      My_HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7);
+    }
 
     //old_odr = GPIOC->ODR;
     // Toggle the output state of both PC8 and PC9
     //HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8 | GPIO_PIN_9);
-    My_HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7);
+    //My_HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7);
     //assert(((GPIOC->ODR ^ old_odr) & (GPIO_PIN_8 | GPIO_PIN_9)) == (GPIO_PIN_8 | GPIO_PIN_9)); // ensure GPIOC->ODR is toggling as it should
   }
+
   return -1;
 }
 
