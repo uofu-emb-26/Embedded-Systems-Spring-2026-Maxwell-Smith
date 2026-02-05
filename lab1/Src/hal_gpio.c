@@ -4,29 +4,60 @@
 
 void My_HAL_GPIO_Init(GPIO_TypeDef  *GPIOx, GPIO_InitTypeDef *GPIO_Init)
 {
-    uint32_t pin_mask;
-    uint32_t isolate_vals_mask;
-    uint32_t moder_set_mask;
+    uint32_t i;
+    uint32_t mask;
+    uint32_t shift_amt;
 
-    if (GPIOx == GPIOC){
-        pin_mask = (1u << 6u) | (1u << 7u) | (1u << 8u) | (1u << 9u);
+    uint32_t pins = GPIOx->PIN;
 
-        isolate_vals_mask = (3u << 12u) | (3u << 14u) | (3u << 16u) | (3u << 18u);
+    for (i = 0; i < 16u; i++){
+        mask = (1u << i);
+        shift_amt = 2u * i;
 
-        moder_set_mask = (1u << 12u) | (1u << 14u) | (1u << 16u) | (1u << 18u);
+        if ((pins & mask) == 0u){
+            continue;
+        }
 
-        GPIOx->MODER = (GPIOx->MODER & ~isolate_vals_mask) | moder_set_mask;
-        GPIOx->OSPEEDR &= ~isolate_vals_mask;
-        GPIOx->PUPDR &= ~isolate_vals_mask;
-        GPIOx->OTYPER &= ~pin_mask;
+        GPIOx->MODER &= ~(3u << shift_amt);
+
+        if (GPIO_Init->MODE == GPIO_MODE_OUTPUT_PP || GPIO_Init->MODE == GPIO_MODE_OUTPUT_OD){
+            GPIOx->MODER |= (1u << shift_amt);
+        }
+
+        if (GPIO_Init->MODE == GPIO_MODE_OUTPUT_OD){
+            GPIOx->OTYPER |= mask;
+        }
+        else {
+            GPIOx->OTYPER &= mask;
+        }
+
+        GPIOx->OSPEEDR &= ~(3u << shift_amt);
+        GPIOx->OSPEED |= ((GPIO_Init->Speed & 3u) << shift_amt);
     }
-    else if (GPIOx == GPIOA){
-        isolate_vals_mask = 3u;
+
+    // uint32_t pin_mask;
+    // uint32_t isolate_vals_mask;
+    // uint32_t moder_set_mask;
+
+    // if (GPIOx == GPIOC){
+    //     pin_mask = (1u << 6u) | (1u << 7u) | (1u << 8u) | (1u << 9u);
+
+    //     isolate_vals_mask = (3u << 12u) | (3u << 14u) | (3u << 16u) | (3u << 18u);
+
+    //     moder_set_mask = (1u << 12u) | (1u << 14u) | (1u << 16u) | (1u << 18u);
+
+    //     GPIOx->MODER = (GPIOx->MODER & ~isolate_vals_mask) | moder_set_mask;
+    //     GPIOx->OSPEEDR &= ~isolate_vals_mask;
+    //     GPIOx->PUPDR &= ~isolate_vals_mask;
+    //     GPIOx->OTYPER &= ~pin_mask;
+    // }
+    // else if (GPIOx == GPIOA){
+    //     isolate_vals_mask = 3u;
         
-        GPIOx->MODER &= ~isolate_vals_mask;
-        GPIOx->OSPEEDR &= ~isolate_vals_mask;
-        GPIOx->PUPDR = (GPIOx->PUPDR & ~isolate_vals_mask) | 2u;
-    }
+    //     GPIOx->MODER &= ~isolate_vals_mask;
+    //     GPIOx->OSPEEDR &= ~isolate_vals_mask;
+    //     GPIOx->PUPDR = (GPIOx->PUPDR & ~isolate_vals_mask) | 2u;
+    // }
 }
 
 
@@ -43,14 +74,16 @@ GPIO_PinState My_HAL_GPIO_ReadPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 }
 */
 
-/*
+
 void My_HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState)
 {
-}
-*/
 
-/*
+}
+
+
+
 void My_HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
+
 }
-*/
+
