@@ -15,7 +15,7 @@ void HAL_RCC_GPIOC_CLK_Enable(void)
 
 }
 
-void HAL_RCC_GPIOC_CLK_Enable(void)
+void HAL_RCC_GPIOA_CLK_Enable(void)
 {
     #ifdef RCC_AHBENR_GPIOA_EN
         RCC->AHBENR |= RCC_AHBENR_GPIOA_EN;
