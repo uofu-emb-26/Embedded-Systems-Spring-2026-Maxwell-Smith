@@ -1,6 +1,7 @@
 #include "main.h"
 #include "stm32f0xx_hal.h"
 #include "rcc.h"
+#include "hal_gpio.h"
 
 #include "assert.h"
 
@@ -52,8 +53,8 @@ int main(void)
   
 
   //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
-  MY_HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
-  MY_HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
+  My_HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+  My_HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
 
   //assert((GPIOC->ODR & GPIO_PIN_8) != 0u); // Should have been set
   //assert((GPIOC->ODR & GPIO_PIN_9) == 0u); // should not have been set
@@ -65,7 +66,7 @@ int main(void)
     //old_odr = GPIOC->ODR;
     // Toggle the output state of both PC8 and PC9
     //HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8 | GPIO_PIN_9);
-    MY_HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7);
+    My_HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7);
     //assert(((GPIOC->ODR ^ old_odr) & (GPIO_PIN_8 | GPIO_PIN_9)) == (GPIO_PIN_8 | GPIO_PIN_9)); // ensure GPIOC->ODR is toggling as it should
   }
   return -1;

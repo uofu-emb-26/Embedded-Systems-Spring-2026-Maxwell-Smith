@@ -8,7 +8,7 @@ void My_HAL_GPIO_Init(GPIO_TypeDef  *GPIOx, GPIO_InitTypeDef *GPIO_Init)
     uint32_t mask;
     uint32_t shift_amt;
 
-    uint32_t pins = GPIO_Init.Pin;
+    uint32_t pins = GPIO_Init->Pin;
 
     for (i = 0; i < 16u; i++){
         mask = (1u << i);
@@ -20,11 +20,11 @@ void My_HAL_GPIO_Init(GPIO_TypeDef  *GPIOx, GPIO_InitTypeDef *GPIO_Init)
 
         GPIOx->MODER &= ~(3u << shift_amt);
 
-        if (GPIO_Init.MODE == GPIO_MODE_OUTPUT_PP || GPIO_Init.MODE == GPIO_MODE_OUTPUT_OD){
+        if (GPIO_Init->Mode == GPIO_MODE_OUTPUT_PP || GPIO_Init->Mode == GPIO_MODE_OUTPUT_OD){
             GPIOx->MODER |= (1u << shift_amt);
         }
 
-        if (GPIO_Init.MODE == GPIO_MODE_OUTPUT_OD){
+        if (GPIO_Init->Mode == GPIO_MODE_OUTPUT_OD){
             GPIOx->OTYPER |= mask;
         }
         else {
